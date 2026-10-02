@@ -1,0 +1,48 @@
+title: Script Or Executable Created In Startup Folder
+id: 27650cca-d6ac-496e-a2aa-a50f396ec838
+status: experimental
+description: |
+    Detects creation of scripts, executables, shortcuts or libraries in the per-user or all-users
+    Startup folder. Catches the persistence artifact regardless of the tool that dropped it
+    (Copy-Item, copy, xcopy, COM shortcut creation, malware API calls).
+references:
+    - https://www.atomicredteam.io/docs/atomics/T1547.001
+    - https://attack.mitre.org/techniques/T1547/001/
+author: Saksham Bhattarai
+date: 2026-09-28
+tags:
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.t1547.001
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection_path:
+        TargetFilename|contains: '\Start Menu\Programs\Startup\'
+    selection_ext:
+        TargetFilename|endswith:
+            - '.vbs'
+            - '.vbe'
+            - '.js'
+            - '.jse'
+            - '.wsf'
+            - '.wsh'
+            - '.bat'
+            - '.cmd'
+            - '.ps1'
+            - '.hta'
+            - '.exe'
+            - '.dll'
+            - '.scr'
+            - '.cpl'
+            - '.lnk'
+    filter_main_installers:
+        Image|endswith:
+            - '\msiexec.exe'
+            - '\OneDriveSetup.exe'
+    condition: selection_path and selection_ext and not filter_main_installers
+falsepositives:
+    - Legitimate applications placing .lnk shortcuts in Startup (.lnk is the noisiest extension; baseline it)
+    - Software deployment tools and login scripts
+level: medium

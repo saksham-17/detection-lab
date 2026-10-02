@@ -1,0 +1,48 @@
+title: Autostart Registry Value Set
+id: 1bb20201-f024-4edf-b972-21934004b503
+status: experimental
+description: |
+    Detects registry value writes to autostart locations: Run/RunOnce/RunOnceEx, Policies\Explorer\Run,
+    User Shell Folders Startup/Common Startup, Winlogon Userinit/Shell (non-default values),
+    BootExecute, RDP StartupPrograms, BootVerificationProgram, Recycle Bin CLSID open-command hijack
+    and Directory Background shell command (context menu persistence).
+references:
+    - https://www.atomicredteam.io/docs/atomics/T1547.001
+    - https://attack.mitre.org/techniques/T1547/001/
+author: Saksham Bhattarai
+date: 2026-09-28
+tags:
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.t1547.001
+    - attack.t1547.004
+logsource:
+    category: registry_set
+    product: windows
+detection:
+  selection:
+    TargetObject|contains:
+      - '\CurrentVersion\Run\'
+      - '\CurrentVersion\RunOnce\'
+      - '\CurrentVersion\RunOnceEx\'
+      - '\CurrentVersion\Policies\Explorer\Run\'
+      - '\User Shell Folders\Startup'
+      - '\User Shell Folders\Common Startup'
+      - '\Session Manager\BootExecute'
+      - '\Policies\Explorer\Run\'
+      - '\Explorer\User Shell Folders\Startup'
+      - '\Explorer\User Shell Folders\Common Startup'
+      - '\Winlogon\Userinit'
+      - '\Winlogon\Shell'
+      - '\Session Manager\BootExecute'
+      - '\Wds\rdpwd\StartupPrograms'
+      - '\Control\BootVerificationProgram\ImagePath'
+  filter_legitimate:
+    Image|endswith:
+      - '\msiexec.exe'
+      - '\OneDriveSetup.exe'
+  condition: selection and not filter_legitimate
+falsepositives:
+    - Legitimate software installers and updaters modifying Run keys
+    - Legitimate applications configuring startup behavior
+level: medium

@@ -120,9 +120,9 @@ Event ID 11: Sysmon File Created
   | table _time host user Image ProcessId TargetFilename CreationUtcTime 
   | sort - _time
 ```
-![Event ID 4698: Sysmon File Created](./artifacts/test4_11.png)
-![Event ID 4698: Sysmon File Created](./artifacts/test5_11.png)
-![Event ID 4698: Sysmon File Created](./artifacts/test7_11.png)
+![Event ID 11: Sysmon File Created](./artifacts/test4_11.png)
+![Event ID 11: Sysmon File Created](./artifacts/test5_11.png)
+![Event ID 11: Sysmon File Created](./artifacts/test7_11.png)
 
 
 ## References
