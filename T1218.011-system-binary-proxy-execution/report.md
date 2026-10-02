@@ -29,7 +29,6 @@ EventCode=1
 process_name="rundll32.exe"
 (process="*advpack.dll,LaunchINFSection*" OR process="*advpack.dll,RegisterOCX*" OR process="*advpack.dll,DelNodeRunDLL32*"
  OR process="*setupapi.dll,InstallHinfSection*" OR process="*syssetup.dll,SetupInfObjectInstallAction*")
-| regex process!="(?i)\x5c(windows\x5cinf|driverstore|program files( \(x86\))?)\x5c"
 | table _time EventCode host user parent_process_name process_name process
 | sort - _time
 ```
@@ -45,7 +44,6 @@ source="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
 EventCode=1
 process_name="rundll32.exe"
 (process="*url.dll,FileProtocolHandler*" OR process="*url.dll,OpenURL*" OR process="*ieframe.dll,OpenURL*")
-| regex process!="(?i)(fileprotocolhandler|openurl)\s+\x22?(https?|mailto|ftp):"
 | table _time EventCode host user parent_process_name process_name process
 | sort - _time
 ```
