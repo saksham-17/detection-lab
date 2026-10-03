@@ -1,0 +1,51 @@
+title: Autostart Persistence Via Command Line - Registry Keys And Startup Folder
+id: 3120ef4f-85a4-400b-8dfc-953cc83562dc
+status: experimental
+description: |
+    Detects command lines that add autostart entries through reg.exe or PowerShell registry cmdlets
+    (Run/RunOnce/RunOnceEx, Policies\Explorer\Run, User Shell Folders, Winlogon Userinit/Shell,
+    BootExecute, RDP StartupPrograms, BootVerificationProgram, Recycle Bin CLSID hijack,
+    Directory Background context menu), or scripts/copies touching the Startup folder.
+references:
+    - https://www.atomicredteam.io/docs/atomics/T1547.001
+    - https://attack.mitre.org/techniques/T1547/001/
+author: Saksham Bhattarai
+date: 2026-09-28
+tags:
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.t1547.001
+    - attack.t1547.004
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_reg:
+        Image|endswith: '\reg.exe'
+        CommandLine|contains:
+            - ' add '
+            - 'CurrentVersion\Run'
+            - 'CurrentVersion\RunOnce'
+            - 'CurrentVersion\RunOnceEx'
+            - 'Policies\Explorer\Run'
+    selection_powershell:
+        Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+        CommandLine|contains:
+            - 'Set-ItemProperty'
+            - 'New-ItemProperty'
+    selection_startup:
+        Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\cmd.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+            - '\mshta.exe'
+        CommandLine|contains: '\Start Menu\Programs\Startup'
+    condition: selection_reg or selection_powershell or selection_startup
+falsepositives:
+    - Software installers and updaters writing Run keys
+    - Administrators deploying startup scripts or GPO-style tweaks with reg.exe
+level: medium
