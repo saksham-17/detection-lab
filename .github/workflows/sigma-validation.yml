@@ -1,0 +1,32 @@
+name: Sigma Rule Validation
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install sigma-cli
+        run: python -m pip install sigma-cli
+
+      - name: Validate all Sigma rules
+        run: |
+          find . -type f \( -name "*.yml" -o -name "*.yaml" \) \
+            ! -path "./.git/*" \
+            ! -path "./.github/*" \
+            -print0 |
+          while IFS= read -r -d '' rule; do
+            echo "Checking: $rule"
+            sigma check --fail-on-error "$rule" || exit 1
+          done
